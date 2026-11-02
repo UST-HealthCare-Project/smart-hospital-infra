@@ -34,7 +34,7 @@ data "aws_iam_policy_document" "assume" {
     condition {
       test     = "StringLike"
       variable = "${local.oidc_host}:sub"
-      values   = [for s in var.allowed_subjects : "repo:${var.github_repository}:${s}"]
+      values   = flatten([for r in var.github_repositories : [for s in var.allowed_subjects : "repo:${r}:${s}"]])
     }
   }
 }

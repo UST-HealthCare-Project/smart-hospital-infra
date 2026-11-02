@@ -9,13 +9,18 @@ variable "create_oidc_provider" {
   default     = true
 }
 
-variable "github_repository" {
-  description = "GitHub repository allowed to assume the role, as owner/name."
-  type        = string
+variable "github_repositories" {
+  description = "GitHub repositories allowed to assume the role, as owner/name."
+  type        = list(string)
+
+  validation {
+    condition     = length(var.github_repositories) > 0
+    error_message = "At least one GitHub repository is required."
+  }
 }
 
 variable "allowed_subjects" {
-  description = "OIDC sub claims (after repo:<owner/name>:) allowed to assume the role, for example ref:refs/heads/main or environment:dev."
+  description = "OIDC sub claims (after repo:<owner/name>:) allowed to assume the role for every repository in github_repositories, for example ref:refs/heads/main or environment:dev."
   type        = list(string)
   default     = ["ref:refs/heads/main"]
 }

@@ -1,0 +1,62 @@
+# Offline checks only: formatting, validation and the mocked-provider wiring test. No AWS credentials,
+# no plan or apply against a real account.
+name: Terraform
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: terraform-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  fmt:
+    name: terraform fmt
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.17.0"
+      - run: terraform fmt -check -recursive infra/terraform
+
+  validate:
+    name: validate ${{ matrix.environment }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        environment: [dev, dev-observability, clinical-platform]
+    defaults:
+      run:
+        working-directory: infra/terraform/environments/${{ matrix.environment }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.17.0"
+      - run: terraform init -backend=false -input=false
+      - run: terraform validate
+      - name: terraform test (mocked providers)
+        if: hashFiles(format('infra/terraform/environments/{0}/tests/*.tftest.hcl', matrix.environment)) != ''
+        run: terraform test
+
+  secret-scan:
+    name: secret scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      # gitleaks CLI image (the gitleaks-action needs a paid licence for organization repositories).
+      - name: gitleaks (full history)
+        run: docker run --rm -v "$PWD:/repo" ghcr.io/gitleaks/gitleaks:v8.21.2 detect --source /repo --redact --verbose

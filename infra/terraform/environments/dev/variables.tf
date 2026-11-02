@@ -226,9 +226,9 @@ variable "waf_rate_limit_per_5_minutes" {
 }
 
 # ---------- CI/CD ----------
-variable "github_repository" {
-  description = "GitHub repository (owner/name) allowed to assume the CI/CD role."
-  type        = string
+variable "github_repositories" {
+  description = "GitHub repositories (owner/name) allowed to assume the CI/CD role."
+  type        = list(string)
 }
 
 variable "github_allowed_subjects" {

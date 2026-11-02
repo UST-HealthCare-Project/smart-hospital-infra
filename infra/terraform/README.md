@@ -78,8 +78,9 @@ Keep the bootstrap `terraform.tfstate` file safe (it is git-ignored) or migrate 
 - **Images:** push to the URLs in `terraform output ecr_repository_urls` (`smart-hospital/<service>`). Tags are
   immutable; tag with the git SHA.
 - **CI/CD:** GitHub Actions assumes `terraform output github_actions_role_arn` through OIDC (no stored AWS keys).
-  It may push to the 8 repositories and has the EKS edit policy in the `smart-hospital` namespace only. Allowed
-  branches are set by `github_allowed_subjects`.
+  It may push to the 8 repositories and has the EKS edit policy in the `smart-hospital` namespace only. The GitHub
+  repositories allowed to assume it are `github_repositories` (one per service repository); allowed branches are set
+  by `github_allowed_subjects`.
 - **Kubernetes Services:** each service is exposed as `type: NodePort` on the port in
   `terraform output service_node_ports` (container port 8000). The ALB target groups use the worker node Auto Scaling
   group and health-check `/health`. No AWS Load Balancer Controller is needed.

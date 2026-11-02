@@ -116,7 +116,17 @@ enable_waf                   = true
 waf_rate_limit_per_5_minutes = 2000
 
 # ---------- CI/CD (GitHub Actions OIDC) ----------
-github_repository           = "Msocial123/UST-HealthCare-Project"
+# One repository per service in the UST-HealthCare-Project organization. The monorepo stays trusted until it is
+# retired, so its existing build-push workflow keeps working during the cutover.
+github_repositories = [
+  "UST-HealthCare-Project/identity-service",
+  "UST-HealthCare-Project/patient-service",
+  "UST-HealthCare-Project/provider-service",
+  "UST-HealthCare-Project/facility-service",
+  "UST-HealthCare-Project/scheduling-service",
+  "UST-HealthCare-Project/appointment-service",
+  "Msocial123/UST-HealthCare-Project",
+]
 github_allowed_subjects     = ["ref:refs/heads/main"]
 github_create_oidc_provider = true # set false if the account already has the GitHub OIDC provider
 

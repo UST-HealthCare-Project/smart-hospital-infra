@@ -210,7 +210,7 @@ module "github_oidc" {
 
   name                  = local.name
   create_oidc_provider  = var.github_create_oidc_provider
-  github_repository     = var.github_repository
+  github_repositories   = var.github_repositories
   allowed_subjects      = var.github_allowed_subjects
   ecr_repository_arns   = values(module.ecr.repository_arns)
   cluster_name          = module.eks.cluster_name
